@@ -1,5 +1,6 @@
 # Data
 data/
+!src/data/
 
 # MacOS
 .DS_Store

@@ -98,7 +98,7 @@ def train_and_recommend(top_n=10, force=False):
     return output_file
 
 
-def evaluate_model(k_values=[1, 3, 5, 10, 5000], watch_threshold=0.5, force=False):
+def evaluate_model(k_values=[1, 3, 5, 10, 500], watch_threshold=0.5, force=False):
     """
     Evaluate model performance using precision, recall, MAP, and NDCG.
     """
@@ -174,12 +174,12 @@ if __name__ == "__main__":
 
     # Parameter customization
     parser.add_argument(
-        "--top-n", type=int, default=5000, help="Number of recommendations per user"
+        "--top-n", type=int, default=500, help="Number of recommendations per user"
     )
     parser.add_argument(
         "--k-values",
         type=str,
-        default="1,3,5,10,5000",
+        default="1,3,5,10,500",
         help="Comma-separated list of k values for evaluation",
     )
     parser.add_argument(

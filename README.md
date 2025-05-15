@@ -258,13 +258,13 @@ def ndcg_at_k(recommended, relevant, k):
 
 The following table summarizes the system's performance at different $k$ values:
 
-| k    | Precision | Recall  | MAP   | NDCG  |
-| :--- | :-------- | :------ | :---- | :---- |
-| 1    | 0.511     | 0.00021 | 0.511 | 0.511 |
-| 3    | 0.519     | 0.00065 | 0.449 | 0.517 |
-| 5    | 0.522     | 0.00109 | 0.420 | 0.519 |
-| 10   | 0.522     | 0.00218 | 0.388 | 0.520 |
-| 5000 | 0.312     | 0.645   | 0.417 | 0.615 |
+| k   | Precision | Recall  | MAP   | NDCG  |
+| :-- | :-------- | :------ | :---- | :---- |
+| 1   | 0.512     | 0.00021 | 0.512 | 0.512 |
+| 3   | 0.516     | 0.00065 | 0.448 | 0.515 |
+| 5   | 0.521     | 0.00109 | 0.422 | 0.519 |
+| 10  | 0.517     | 0.00215 | 0.388 | 0.517 |
+| 500 | 0.569     | 0.11797 | 0.351 | 0.557 |
 
 **Interpretation:**
 
@@ -279,36 +279,40 @@ _This figure shows how Precision, Recall, MAP, and NDCG evolve with $k$._
 
 ---
 
-## **7.1. Pipeline Execution Log**
+### **7.1. Pipeline Execution Log**
 
 Below is the execution log from the recommendation pipeline, showing the processing steps and timing:
 
-```bash
-2025-05-15 10:41:20,978 - main-pipeline - INFO - Starting recommendation pipeline...
-2025-05-15 10:41:20,979 - main-pipeline - INFO - Training model and generating top-1000 recommendations...
-2025-05-15 10:43:42,762 - src.recommenders.content_based_recommender - INFO - Loaded train data with 12530806 interactions
-2025-05-15 10:44:12,017 - src.recommenders.content_based_recommender - INFO - Loaded test data with 4676570 interactions
-2025-05-15 10:44:12,038 - src.recommenders.content_based_recommender - INFO - Loaded item features with 10728 items
-2025-05-15 10:44:12,109 - src.recommenders.content_based_recommender - INFO - Loaded item categories with 10728 items
-2025-05-15 10:44:12,127 - src.recommenders.content_based_recommender - INFO - Created complete video features with 10728 items
-2025-05-15 10:44:12,177 - src.models.content_model - INFO - Building content-based recommender...
-2025-05-15 10:45:07,259 - src.models.content_model - INFO - Content-based model built with 10728 videos and 7176 users
-2025-05-15 10:45:08,058 - src.recommenders.content_based_recommender - INFO - Generating recommendations for 1411 users in test set
-2025-05-15 10:45:08,654 - src.recommenders.content_based_recommender - INFO - Processed 100/1411 users
-2025-05-15 10:45:09,167 - src.recommenders.content_based_recommender - INFO - Processed 200/1411 users
+```log
+
+2025-05-15 19:06:20,538 - main-pipeline - INFO - Starting recommendation pipeline...
+2025-05-15 19:06:20,732 - main-pipeline - INFO - Preprocessing training data...
+2025-05-15 19:07:23,281 - src.data.preprocess - INFO - Saved train_merged.csv with shape: (12530806, 7)
+2025-05-15 19:07:23,539 - main-pipeline - INFO - Preprocessing testing data...
+2025-05-15 19:07:43,883 - src.data.preprocess - INFO - Saved test_merged.csv with shape: (4676570, 7)
+2025-05-15 19:07:43,939 - main-pipeline - INFO - Generating item engagement features...
+2025-05-15 19:07:43,940 - src.data.item_engagement_features - INFO - Generating item features from train_merged.csv...
+2025-05-15 19:07:48,758 - src.data.item_engagement_features - INFO - Saved item features to data/features/item_engagement_features.csv with shape: (10728, 14)
+2025-05-15 19:07:48,783 - main-pipeline - INFO - Training model and generating top-500 recommendations...
+2025-05-15 19:07:53,690 - src.recommenders.content_based_recommender - INFO - Loaded train data with 12530806 interactions
+2025-05-15 19:07:55,352 - src.recommenders.content_based_recommender - INFO - Loaded test data with 4676570 interactions
+2025-05-15 19:07:55,368 - src.recommenders.content_based_recommender - INFO - Loaded item features with 10728 items
+2025-05-15 19:07:55,368 - src.models.content_model - INFO - Building content-based recommender...
+2025-05-15 19:08:03,257 - src.models.content_model - INFO - Content-based model built with 10728 videos and 7176 users
+2025-05-15 19:08:03,287 - src.recommenders.content_based_recommender - INFO - Generating recommendations for 1411 users in test set
+2025-05-15 19:08:03,716 - src.recommenders.content_based_recommender - INFO - Processed 100/1411 users
+2025-05-15 19:08:04,154 - src.recommenders.content_based_recommender - INFO - Processed 200/1411 users
 ...
-2025-05-15 10:45:14,540 - src.recommenders.content_based_recommender - INFO - Processed 1300/1411 users
-2025-05-15 10:45:15,023 - src.recommenders.content_based_recommender - INFO - Processed 1400/1411 users
-2025-05-15 10:45:17,736 - src.recommenders.content_based_recommender - INFO - Saved 1411000 recommendations to data/results/content_based_top1000_recommendations.csv
-2025-05-15 10:45:17,750 - src.recommenders.content_based_recommender - INFO - Average recommendations per user: 1000.00
-2025-05-15 10:45:17,750 - src.recommenders.content_based_recommender - INFO - Min recommendations per user: 1000
-2025-05-15 10:45:17,750 - src.recommenders.content_based_recommender - INFO - Recommendation coverage: 1411/1411 users (100.00%)
-2025-05-15 10:45:19,488 - main-pipeline - INFO - Evaluating model with k=[10, 50, 100, 500, 1000], threshold=0.5...
-2025-05-15 10:46:47,899 - main-pipeline - INFO - Starting recommendation pipeline...
-2025-05-15 10:46:47,900 - main-pipeline - INFO - Training model and generating top-1000 recommendations...
-2025-05-15 10:47:02,788 - main-pipeline - INFO - Starting recommendation pipeline...
-2025-05-15 10:47:02,788 - main-pipeline - INFO - Evaluating model with k=[10, 50, 100, 500, 1000], threshold=0.5...
-2025-05-15 10:48:02,566 - main-pipeline - INFO - Pipeline completed in 59.78 seconds.
+2025-05-15 19:08:08,823 - src.recommenders.content_based_recommender - INFO - Processed 1300/1411 users
+2025-05-15 19:08:09,242 - src.recommenders.content_based_recommender - INFO - Processed 1400/1411 users
+2025-05-15 19:08:10,579 - src.recommenders.content_based_recommender - INFO - Saved 705500 recommendations to data/results/content_based_top500_recommendations.csv
+2025-05-15 19:08:10,584 - src.recommenders.content_based_recommender - INFO - Average recommendations per user: 500.00
+2025-05-15 19:08:10,584 - src.recommenders.content_based_recommender - INFO - Min recommendations per user: 500
+2025-05-15 19:08:10,584 - src.recommenders.content_based_recommender - INFO - Recommendation coverage: 1411/1411 users (100.00%)
+2025-05-15 19:08:10,584 - src.recommenders.content_based_recommender - INFO - Generated recommendations with weights: {'engagement_score': 3.5, 'hybrid_score': 3.0, 'popularity_score': 15, 'tags': 3.5}
+2025-05-15 19:08:10,824 - main-pipeline - INFO - Evaluating model with k=[1, 3, 5, 10, 500], threshold=0.5...
+2025-05-15 19:08:19,258 - main-pipeline - INFO - Pipeline completed in 118.72 seconds.
+
 ```
 
 ---

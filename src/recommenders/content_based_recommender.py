@@ -14,10 +14,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 FEATURE_WEIGHTS = {
-    "engagement_score": 3.0,
+    "engagement_score": 3.5,
     "hybrid_score": 3.0,
-    "popularity_score": 2.0,
-    "tags": 0.5,
+    "popularity_score": 15,
+    "tags": 3.5,
 }
 
 
@@ -55,7 +55,7 @@ def generate_recommendations(recommender, test_users, top_n=10):
             user_id,
             n_items=top_n,
             exclude_watched=True,
-            diversity_factor=0,
+            diversity_factor=0.2,
         )
 
         for rank, (video_id, score) in enumerate(recs, 1):
@@ -102,6 +102,7 @@ def main(top_n=10):
     recs_df = save_recommendations(recommendations, top_n)
 
     print_recommendation_stats(recs_df, test_users)
+    logger.info(f"Generated recommendations with weights: {FEATURE_WEIGHTS}")
 
 
 if __name__ == "__main__":

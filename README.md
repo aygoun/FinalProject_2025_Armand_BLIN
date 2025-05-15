@@ -1,6 +1,7 @@
 # Short Video Recommender System (KuaiRec dataset)
 
 This project is part of the Recommender Systems course @ EPITA (SCIA - ING2 2025)
+
 **Student**: Armand BLIN (armand.blin@epita.fr)
 
 ## **1. Introduction**
@@ -49,7 +50,7 @@ To capture both the quality and reach of each video, we define two main metrics:
 - **Popularity Score (normalized):**
 
 $$
-\text{popularity\_score}_i = \frac{N_i - N_{\min}}{N_{\max} - N_{\min} + \epsilon}
+\mathrm{popularity\_score}_i = \frac{N_i - N_{\min}}{N_{\max} - N_{\min} + \epsilon}
 $$
 
 where $N_i$ is the number of interactions for video $i$.
@@ -57,15 +58,15 @@ where $N_i$ is the number of interactions for video $i$.
 - **Engagement Score (weighted sum):**
 
 $$
-\text{engagement\_score}_i = w_1 \cdot \overline{\text{watch\_ratio}}_i + w_2 \cdot \sigma_{\text{watch\_ratio},i} + w_3 \cdot \overline{\text{like}}_i + w_4 \cdot \overline{\text{comment}}_i + w_5 \cdot \overline{\text{share}}_i
+\mathrm{engagement\_score}_i = w_1 \cdot \overline{\mathrm{watch\_ratio}}_i + w_2 \cdot \sigma_{\mathrm{watch\_ratio},i} + w_3 \cdot \overline{\mathrm{like}}_i + w_4 \cdot \overline{\mathrm{comment}}_i + w_5 \cdot \overline{\mathrm{share}}_i
 $$
 
-with empirically chosen weights, e.g., $w_1=0.3, w_2=0.1, w_3=0.25, w_4=0.15, w_5=0.2$.
+with empirically chosen weights, e.g., $w_1 = 0.3,\, w_2 = 0.1,\, w_3 = 0.25,\, w_4 = 0.15,\, w_5 = 0.2$.
 
 - **Hybrid Score:**
 
 $$
-\text{hybrid\_score}_i = 0.7 \cdot \text{engagement\_score}_i + 0.3 \cdot \text{popularity\_score}_i
+\mathrm{hybrid\_score}_i = 0.7 \cdot \mathrm{engagement\_score}_i + 0.3 \cdot \mathrm{popularity\_score}_i
 $$
 
 **Example code snippet:**
@@ -86,12 +87,12 @@ item_agg["engagement_score"] = (
 Tags are vectorized using multi-label binarization. Feature weighting is applied to emphasize the importance of certain features:
 
 $$
-\text{feature\_weights} =
+\mathrm{feature\_weights} =
 \begin{cases}
-3.0 & \text{engagement\_score} \\
-3.0 & \text{hybrid\_score} \\
-2.0 & \text{popularity\_score} \\
-0.5 & \text{tags}
+3.0 & \text{for } \mathrm{engagement\_score} \\
+3.0 & \text{for } \mathrm{hybrid\_score} \\
+2.0 & \text{for } \mathrm{popularity\_score} \\
+0.5 & \text{for } \mathrm{tags}
 \end{cases}
 $$
 
@@ -135,7 +136,7 @@ user_id
 Each user profile is computed as a weighted average of the feature vectors of the videos they have watched, with the watch ratio squared to emphasize strong engagement:
 
 $$
-\mathbf{u}_j = \frac{\sum_{i \in \mathcal{V}_j} (\text{watch\_ratio}_{i,j})^2 \cdot \mathbf{v}_i}{\sum_{i \in \mathcal{V}_j} (\text{watch\_ratio}_{i,j})^2}
+\mathbf{u}_j = \frac{\sum_{i \in \mathcal{V}_j} (\mathrm{watch\_ratio}_{i,j})^2 \cdot \mathbf{v}_i}{\sum_{i \in \mathcal{V}_j} (\mathrm{watch\_ratio}_{i,j})^2}
 $$
 
 where $\mathbf{v}_i$ is the feature vector for video $i$, and $\mathcal{V}_j$ is the set of videos watched by user $j$.
@@ -168,11 +169,6 @@ flowchart TD
     WV1 & WV2 & WV3 --> SUM["Sum all weighted vectors"]
     SUM --> NORM["Normalize by total weight"]
     NORM --> UP["User Profile Vector"]
-
-    %% Optional: show formula
-    classDef formula fill:#72A768,stroke:#355934,stroke-width:1px;
-    F1["$$\mathbf{u}_j = \frac{\sum_{i \in \mathcal{V}_j} (\text{watch\_ratio}_{i,j})^2 \cdot \mathbf{v}_i}{\sum_{i \in \mathcal{V}_j} (\text{watch\_ratio}_{i,j})^2}$$"]:::formula
-    UP -.-> F1
 ```
 
 </center>
@@ -184,7 +180,7 @@ flowchart TD
 The system computes the cosine similarity between the user profile and all candidate videos:
 
 $$
-\text{sim}(\mathbf{u}_j, \mathbf{v}_i) = \frac{\mathbf{u}_j \cdot \mathbf{v}_i}{\|\mathbf{u}_j\| \cdot \|\mathbf{v}_i\|}
+\mathrm{sim}(\mathbf{u}_j, \mathbf{v}_i) = \frac{\mathbf{u}_j \cdot \mathbf{v}_i}{\|\mathbf{u}_j\| \cdot \|\mathbf{v}_i\|}
 $$
 
 Videos are ranked by similarity, and the top-N items are recommended, excluding those already watched. An optional diversity factor can be applied to introduce more varied recommendations.
@@ -220,25 +216,25 @@ The evaluation uses standard metrics at various $k$ values:
 - **Precision@k:**
 
 $$
-\text{Precision@k} = \frac{|\{\text{Recommended} \cap \text{Relevant}\}_{@k}|}{k}
+\mathrm{Precision@k} = \frac{|\{\mathrm{Recommended} \cap \mathrm{Relevant}\}_{@k}|}{k}
 $$
 
 - **Recall@k:**
 
 $$
-\text{Recall@k} = \frac{|\{\text{Recommended} \cap \text{Relevant}\}_{@k}|}{|\{\text{Relevant}\}|}
+\mathrm{Recall@k} = \frac{|\{\mathrm{Recommended} \cap \mathrm{Relevant}\}_{@k}|}{|\{\mathrm{Relevant}\}|}
 $$
 
 - **MAP@k (Mean Average Precision):**
 
 $$
-\text{MAP@k} = \frac{1}{|U|} \sum_{u \in U} \frac{1}{\min(k, |\text{Rel}_u|)} \sum_{i=1}^k P_u(i) \cdot \text{rel}_u(i)
+\mathrm{MAP@k} = \frac{1}{|U|} \sum_{u \in U} \frac{1}{\min(k, |\mathrm{Rel}_u|)} \sum_{i=1}^k P_u(i) \cdot \mathrm{rel}_u(i)
 $$
 
 - **NDCG@k (Normalized Discounted Cumulative Gain):**
 
 $$
-\text{NDCG@k} = \frac{DCG@k}{IDCG@k}, \quad DCG@k = \sum_{i=1}^k \frac{\text{rel}_i}{\log_2(i+1)}
+\mathrm{NDCG@k} = \frac{\mathrm{DCG@k}}{\mathrm{IDCG@k}}, \quad \mathrm{DCG@k} = \sum_{i=1}^k \frac{\mathrm{rel}_i}{\log_2(i+1)}
 $$
 
 **Example code snippet:**
@@ -318,7 +314,5 @@ Below is the execution log from the recommendation pipeline, showing the process
 ---
 
 ## **8. Conclusion**
-
-This content-based recommender system leverages a scientifically justified feature engineering and weighting strategy, resulting in high-quality, scalable recommendations. The approach is modular and reproducible, and can be extended with hybrid or sequence-aware models for further improvements.
 
 This content-based recommender system leverages a scientifically justified feature engineering and weighting strategy, resulting in high-quality, scalable recommendations. The approach is modular and reproducible, and can be extended with hybrid or sequence-aware models for further improvements.

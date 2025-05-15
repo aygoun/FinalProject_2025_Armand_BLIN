@@ -89,23 +89,26 @@ Tags are vectorized using multi-label binarization. Feature weighting is applied
 ```math
 \mathrm{feature\_weights} =
 \begin{cases}
-3.0 & \text{for } \mathrm{engagement\_score} \\
+3.5 & \text{for } \mathrm{engagement\_score} \\
 3.0 & \text{for } \mathrm{hybrid\_score} \\
-2.0 & \text{for } \mathrm{popularity\_score} \\
-0.5 & \text{for } \mathrm{tags}
+15 & \text{for } \mathrm{popularity\_score} \\
+3.5 & \text{for } \mathrm{tags}
 \end{cases}
 ```
 
-**Example code snippet:**
+### **3.3. Feature Weight Interpretation**
 
-```python
-FEATURE_WEIGHTS = {
-    "engagement_score": 3.0,
-    "hybrid_score": 3.0,
-    "popularity_score": 2.0,
-    "tags": 0.5,
-}
-```
+The feature weighting strategy reflects the relative importance of different signals in the recommendation system:
+
+- **Popularity Score (15)**: Receives the highest weight to ensure that widely-consumed content gets appropriate visibility. This helps address the cold-start problem for new users and ensures recommendations include some generally appealing content.
+
+- **Engagement Score (3.5)**: Moderately high weight that prioritizes content with strong user interaction patterns. This captures the quality of user experiences with videos through watch completion rates and social signals.
+
+- **Tags (3.5)**: Equal weight to engagement score, emphasizing the importance of content-based similarity. This ensures recommendations are topically relevant to users' demonstrated interests.
+
+- **Hybrid Score (3.0)**: Slightly lower weight as this feature already incorporates aspects of both popularity and engagement, serving as a balanced signal that doesn't need as much amplification.
+
+This weighting scheme creates a balance between popularity-driven recommendations (addressing cold-start and ensuring broad appeal) and personalized recommendations based on content similarity and engagement patterns. The weights were determined through empirical testing and evaluation of recommendation quality metrics.
 
 **Illustration:**
 ![Correlation Matrix of Engagement Features](docs/correclation_matrix_eng_features.png)

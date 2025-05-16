@@ -51,7 +51,7 @@ Our data exploration provides key insights into the KuaiRec dataset's characteri
 - **Big Matrix**: Full merged matrix combining all user-item interactions with features
 - **Users**: 7,176 unique users in the merged matrix
 - **Videos**: 10,728 unique videos in the merged matrix
-- **Total Interactions**: 12,464,203 records
+- **Total Interactions**: 12,530,806 records
 
 ### **3.2. Engagement Metrics**
 
@@ -69,8 +69,8 @@ Our data exploration provides key insights into the KuaiRec dataset's characteri
 ### **3.3. Social Network Analysis**
 
 - **Friendship Network Sparsity**:
-  - Average friends per user: < 5 connections
-  - Over 60% of users have fewer than 3 friends
+  - Average friends per user: 0.1
+  - Over 99.4% of users have fewer than 3 friends
   - Network density below 0.001, indicating extremely sparse connections
 - **Collaborative Filtering Implications**:
   - The sparse friendship network provides insufficient signal for neighborhood-based collaborative filtering

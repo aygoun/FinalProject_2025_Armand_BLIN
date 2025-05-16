@@ -48,21 +48,23 @@ Our data exploration provides key insights into the KuaiRec dataset's characteri
 ### **3.1. Dataset Overview**
 
 - **Interactions Dataset**: Contains extensive user-video engagement data including watch ratio, likes, comments, and shares
-- **Users**: 7,176 unique users
-- **Videos**: 10,728 unique videos
+- **Big Matrix**: Full merged matrix combining all user-item interactions with features
+- **Users**: 7,176 unique users in the merged matrix
+- **Videos**: 10,728 unique videos in the merged matrix
 - **Total Interactions**: 12,464,203 records
 
 ### **3.2. Engagement Metrics**
 
-- **Watch Ratio**:
-  - Mean: 0.673 (indicating users watch about 67% of videos on average)
-  - Median: 0.500
-  - Some users demonstrate watch ratios > 1, suggesting repeated viewing of content
+- **Watch Ratio in Big Matrix**:
+  - Mean: 0.945 (indicating users watch about 94% of videos on average)
+  - Median: 0.723
+  - Higher values reflect our use of the full merged matrix with complete user-item interactions
+  - Significant portion of users demonstrate watch ratios > 1, suggesting repeated viewing of content
 - **Social Engagement**:
 
-  - Average likes per video: 1,861
-  - Average comments per video: 81
-  - Average shares per video: 19
+  - Average likes per video: 8,853
+  - Average comments per video: 474
+  - Average shares per video: 310
 
 ### **3.3. Social Network Analysis**
 
@@ -95,7 +97,7 @@ Based on this social network analysis, we determined that collaborative filterin
 
 ### **3.6. Anomalies and Edge Cases**
 
-- 1,514,717 entries (12.15%) have watch ratios > 1, indicating repeated viewing
+- The big merged matrix reveals approximately 3.2 million entries (25.7%) have watch ratios > 1, indicating widespread repeated viewing behavior
 - No videos with zero duration found in the dataset
 - Significant variation in engagement levels across different user segments
 
@@ -158,7 +160,7 @@ Tags are vectorized using multi-label binarization. Feature weighting is applied
 3.5 & \text{for } \mathrm{engagement\_score} \\
 3.0 & \text{for } \mathrm{hybrid\_score} \\
 15 & \text{for } \mathrm{popularity\_score} \\
-3.5 & \text{for } \mathrm{tags}
+3.5 & \text{for } \mathrm{feat (tags)}
 \end{cases}
 ```
 
@@ -219,8 +221,6 @@ user_profile = np.average(video_vectors, axis=0, weights=valid_weights)
 
 **Illustration:**
 
-<center>
-
 ```mermaid
 flowchart TD
     subgraph Watched_Videos["Watched Videos"]
@@ -239,9 +239,7 @@ flowchart TD
     NORM --> UP["User Profile Vector"]
 ```
 
-</center>
-
-## _Diagram showing how a user profile is built from watched videos and their engagement levels._
+_Diagram showing how a user profile is built from watched videos and their engagement levels._
 
 ## **6. Recommendation Algorithm**
 
@@ -255,8 +253,6 @@ Videos are ranked by similarity, and the top-N items are recommended, excluding 
 
 **Illustration:**
 _Flowchart of the recommendation process._
-
-<center>
 
 ```mermaid
 flowchart LR
@@ -272,8 +268,6 @@ flowchart LR
     D --> E
 
 ```
-
-</center>
 
 ---
 
@@ -387,7 +381,7 @@ Below is the execution log from the recommendation pipeline, showing the process
 
 ## **8. Conclusion**
 
-This project successfully implemented a content-based recommender system for short videos that achieves high precision (>0.56) and complete user coverage. By leveraging carefully crafted engagement metrics and content features, the system delivers personalized recommendations while addressing the cold-start problem. The sparse social network analysis justified our focus on content-based methods over collaborative filtering approaches.
+This project successfully implemented a content-based recommender system for short videos that achieves high precision (~0.57) and complete user coverage. By leveraging carefully crafted engagement metrics and content features, the system delivers personalized recommendations while addressing the cold-start problem. The sparse social network analysis justified our focus on content-based methods over collaborative filtering approaches.
 
 The system's key strengths lie in its effective feature weighting strategy, computationally efficient similarity calculations, and robust user profile construction. Experimental results demonstrate reliable performance across various evaluation metrics, particularly at higher k values where both precision and recall are balanced.
 

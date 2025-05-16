@@ -80,7 +80,6 @@ def evaluate_model(k_values=[5, 10], watch_threshold=0.5):
     test = pd.read_csv(os.path.join(PROCESSED_DIR, "test_merged.csv"))
     print(f"Loaded test data with {len(test)} interactions")
 
-    # Build ground truth: user_id -> set of relevant video_ids (watched videos)
     # Only consider videos with significant watch time as relevant
     user2relevant = defaultdict(set)
     for row in test.itertuples():
@@ -90,7 +89,6 @@ def evaluate_model(k_values=[5, 10], watch_threshold=0.5):
         ):
             user2relevant[getattr(row, "user_id")].add(getattr(row, "video_id"))
 
-    # Log info about the ground truth
     relevant_counts = [len(videos) for _, videos in user2relevant.items()]
     if relevant_counts:
         avg_relevant = sum(relevant_counts) / len(relevant_counts)
@@ -110,7 +108,7 @@ def evaluate_model(k_values=[5, 10], watch_threshold=0.5):
         user_id = getattr(row, "user_id")
         video_id = getattr(row, "video_id")
         rank = getattr(row, "rank")
-        # Make sure recommendations are properly sorted
+
         while len(user2recs[user_id]) < rank:
             user2recs[user_id].append(None)
         if len(user2recs[user_id]) == rank:
@@ -149,7 +147,7 @@ def evaluate_model(k_values=[5, 10], watch_threshold=0.5):
 
         # Calculate average metrics across all users
         metrics_df = pd.DataFrame(metrics)
-        # Exclude user_id from mean calculation - it's not a metric
+        # Exclude user_id from mean calculation - not a metric
         avg_metrics = metrics_df.drop(columns=["user_id"]).mean()
 
         print(f"Average metrics at k={k}:")

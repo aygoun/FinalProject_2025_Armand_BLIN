@@ -17,7 +17,7 @@ FEATURE_WEIGHTS = {
     "engagement_score": 3.5,
     "hybrid_score": 3.0,
     "popularity_score": 15,
-    "tags": 3.5,
+    "feat": 3.5,  # tags
 }
 
 

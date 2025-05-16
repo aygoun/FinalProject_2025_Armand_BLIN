@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MultiLabelBinarizer
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -47,29 +47,21 @@ class ContentBasedRecommender:
 
     def _process_video_features(self, video_df):
         """Process video features including standardization and weighting"""
-        # Clone the dataframe to avoid modifying the original
         processed_df = video_df.copy()
 
-        if "feat" in processed_df.columns:
-            from sklearn.preprocessing import MultiLabelBinarizer
+        mlb = MultiLabelBinarizer(sparse_output=False)
 
-            mlb = MultiLabelBinarizer(sparse_output=False)
+        tags_encoded = pd.DataFrame(
+            mlb.fit_transform(processed_df["feat"]),
+            columns=mlb.classes_,
+            index=(
+                processed_df.index if "video_id" not in processed_df.columns else None
+            ),
+        )
 
-            # Handle empty DataFrames or all-empty lists
-            if len(processed_df) > 0 and any(len(x) > 0 for x in processed_df["feat"]):
-                tags_encoded = pd.DataFrame(
-                    mlb.fit_transform(processed_df["feat"]),
-                    columns=mlb.classes_,
-                    index=(
-                        processed_df.index
-                        if "video_id" not in processed_df.columns
-                        else None
-                    ),
-                )
-
-                processed_df = pd.concat(
-                    [processed_df.drop(columns=["feat"]), tags_encoded], axis=1
-                )
+        processed_df = pd.concat(
+            [processed_df.drop(columns=["feat"]), tags_encoded], axis=1
+        )
 
         processed_df = processed_df.set_index("video_id")
 
@@ -84,24 +76,11 @@ class ContentBasedRecommender:
                 )
             except ValueError as e:
                 logger.error(f"Error standardizing data: {e}")
-                # If standardization fails, continue without it
-                logger.warning("Continuing without standardization")
 
         # Apply feature weights if specified
         if self.feature_weights:
             for feature, weight in self.feature_weights.items():
-                if feature in processed_df.columns:
-                    processed_df[feature] *= weight
-                elif feature == "tags" and "feat" in video_df.columns:
-                    # Apply weight to all tag columns
-                    tag_cols = [
-                        col
-                        for col in processed_df.columns
-                        if col not in numeric_cols and col not in ["video_id"]
-                    ]
-                    for col in tag_cols:
-                        if col in processed_df.columns:
-                            processed_df[col] *= weight
+                processed_df[feature] *= weight
 
         # Prioritize hybrid_score over engagement_score
         important_features = ["hybrid_score", "engagement_score", "popularity_score"]
@@ -191,7 +170,6 @@ class ContentBasedRecommender:
 
         # Apply diversity - select top items, then some random items from next tier
         if diversity_factor > 0 and len(video_scores) > n_items * 2:
-            # Sort by score
             video_scores.sort(key=lambda x: x[1], reverse=True)
 
             # Split recommendations: top ones and diverse ones

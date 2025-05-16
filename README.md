@@ -41,9 +41,75 @@ merged = merged.fillna(0)
 
 ---
 
-## **3. Feature Engineering**
+## **3. Data Exploration**
 
-### **3.1. Engagement and Popularity Scores**
+Our data exploration provides key insights into the KuaiRec dataset's characteristics and patterns:
+
+### **3.1. Dataset Overview**
+
+- **Interactions Dataset**: Contains extensive user-video engagement data including watch ratio, likes, comments, and shares
+- **Users**: 7,176 unique users
+- **Videos**: 10,728 unique videos
+- **Total Interactions**: 12,464,203 records
+
+### **3.2. Engagement Metrics**
+
+- **Watch Ratio**:
+  - Mean: 0.673 (indicating users watch about 67% of videos on average)
+  - Median: 0.500
+  - Some users demonstrate watch ratios > 1, suggesting repeated viewing of content
+- **Social Engagement**:
+
+  - Average likes per video: 1,861
+  - Average comments per video: 81
+  - Average shares per video: 19
+
+### **3.3. Social Network Analysis**
+
+- **Friendship Network Sparsity**:
+  - Average friends per user: < 5 connections
+  - Over 60% of users have fewer than 3 friends
+  - Network density below 0.001, indicating extremely sparse connections
+- **Collaborative Filtering Implications**:
+  - The sparse friendship network provides insufficient signal for neighborhood-based collaborative filtering
+  - User-user similarity matrices would be dominated by zeroes, leading to poor recommendation quality
+  - Cold-start problem would be particularly severe for new users with no connections
+
+**Visualization:**
+![Distribution of User Connections](docs/number_friends.png)
+_Visualization of the distribution of social connections per user in the dataset._
+
+Based on this social network analysis, we determined that collaborative filtering approaches would produce suboptimal recommendations. This supports our decision to focus on content-based methods that leverage the rich video metadata and engagement signals instead of relying on sparse social connections.
+
+### **3.4. User Behavior Patterns**
+
+- Significant correlation observed between watch ratio and social engagement metrics (likes, comments, shares)
+- Top 20 users by average watch ratio show extremely high engagement (>1.5 watch ratio)
+- Watch behavior varies significantly by video duration, with shorter videos typically having higher completion rates
+
+### **3.5. Content Distribution**
+
+- Videos are tagged with various categories (represented as feature IDs)
+- Tag distribution shows popularity clusters around specific content categories
+- Video length distribution is heavily weighted toward shorter content, with a long tail of longer videos typical of short-form platforms
+
+### **3.6. Anomalies and Edge Cases**
+
+- 1,514,717 entries (12.15%) have watch ratios > 1, indicating repeated viewing
+- No videos with zero duration found in the dataset
+- Significant variation in engagement levels across different user segments
+
+**Visualization:**
+![Top Users by Watch Ratio](docs/top_users_watch_ratio.png)
+_Analysis of top 20 users by average watch ratio, showing highly engaged users._
+
+These insights inform our feature engineering approach, particularly in how we weight engagement signals and normalize metrics across users with different behavior patterns.
+
+---
+
+## **4. Feature Engineering**
+
+### **4.1. Engagement and Popularity Scores**
 
 To capture both the quality and reach of each video, we define two main metrics:
 
@@ -82,7 +148,7 @@ item_agg["engagement_score"] = (
 )
 ```
 
-### **3.2. Tag Vectorization and Feature Weighting**
+### **4.2. Tag Vectorization and Feature Weighting**
 
 Tags are vectorized using multi-label binarization. Feature weighting is applied to emphasize the importance of certain features:
 
@@ -96,7 +162,7 @@ Tags are vectorized using multi-label binarization. Feature weighting is applied
 \end{cases}
 ```
 
-### **3.3. Feature Weight Interpretation**
+### **4.3. Feature Weight Interpretation**
 
 The feature weighting strategy reflects the relative importance of different signals in the recommendation system:
 
@@ -134,7 +200,7 @@ user_id
 
 ---
 
-## **4. User Profile Construction**
+## **5. User Profile Construction**
 
 Each user profile is computed as a weighted average of the feature vectors of the videos they have watched, with the watch ratio squared to emphasize strong engagement:
 
@@ -152,7 +218,6 @@ user_profile = np.average(video_vectors, axis=0, weights=valid_weights)
 ```
 
 **Illustration:**
-_Diagram showing how a user profile is built from watched videos and their engagement levels._
 
 <center>
 
@@ -176,9 +241,9 @@ flowchart TD
 
 </center>
 
----
+## _Diagram showing how a user profile is built from watched videos and their engagement levels._
 
-## **5. Recommendation Algorithm**
+## **6. Recommendation Algorithm**
 
 The system computes the cosine similarity between the user profile and all candidate videos:
 
@@ -212,7 +277,7 @@ flowchart LR
 
 ---
 
-## **6. Evaluation Protocol**
+## **7. Evaluation Protocol**
 
 The evaluation uses standard metrics at various $k$ values:
 
@@ -322,4 +387,8 @@ Below is the execution log from the recommendation pipeline, showing the process
 
 ## **8. Conclusion**
 
-This content-based recommender system leverages a scientifically justified feature engineering and weighting strategy, resulting in high-quality, scalable recommendations. The approach is modular and reproducible, and can be extended with hybrid or sequence-aware models for further improvements.
+This project successfully implemented a content-based recommender system for short videos that achieves high precision (>0.56) and complete user coverage. By leveraging carefully crafted engagement metrics and content features, the system delivers personalized recommendations while addressing the cold-start problem. The sparse social network analysis justified our focus on content-based methods over collaborative filtering approaches.
+
+The system's key strengths lie in its effective feature weighting strategy, computationally efficient similarity calculations, and robust user profile construction. Experimental results demonstrate reliable performance across various evaluation metrics, particularly at higher k values where both precision and recall are balanced.
+
+Future work could explore temporal dynamics of user preferences, incorporate multimodal content features (visual, audio, textual), or implement hybrid approaches that combine the current content-based system with lightweight collaborative signals where available.

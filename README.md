@@ -8,6 +8,8 @@ This project is part of the Recommender Systems course @ EPITA (SCIA - ING2 2025
 
 This report presents the design, implementation, and evaluation of a scalable content-based recommender system for short videos, using the **KuaiRec** dataset. The objective is to emulate real-world platforms such as TikTok or Kuaishou by leveraging user interaction histories, video metadata, and content features to provide highly personalized recommendations.
 
+For detailed data exploration and feature engineering analysis, please refer to the Jupyter notebooks in the `notebooks/` directory, which contain comprehensive visualizations and statistical insights about the dataset characteristics.
+
 ---
 
 ## **2. Data Preprocessing**
@@ -337,7 +339,7 @@ The following table summarizes the system's performance at different $k$ values:
 
 **Illustration:**
 ![Content-based metrics at different k values](docs/content_based_metrics_plot.png)
-_This figure shows how Precision, Recall, MAP, and NDCG evolve with $k$._
+_This figure shows how Precision, Recall, MAP, and NDCG evolve with k._
 
 ---
 

@@ -38,7 +38,7 @@ def generate_item_features(merged_filename, output_filename):
     ) / (item_agg["popularity"].max() - item_agg["popularity"].min() + 1e-10)
 
     # Calculate engagement score (weighted combination)
-    w1, w2, w3, w4, w5 = 0.30, 0.10, 0.25, 0.15, 0.20  # Weights
+    w1, w2, w3, w4, w5 = 0.30, 0.15, 0.35, 0.25, 0.40
     item_agg["engagement_score"] = (
         w1 * item_agg["watch_ratio_mean"]
         + w2
